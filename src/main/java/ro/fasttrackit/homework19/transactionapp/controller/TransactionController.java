@@ -36,10 +36,22 @@ public class TransactionController {
         return transactionService.addTransaction(transaction);
     }
 
-    @SuppressWarnings("unused")
+    @PutMapping("{transactionId}")
+    Transaction replaceTransaction(@PathVariable int transactionId, @RequestBody Transaction newTransaction) {
+        return transactionService.replaceTransaction(transactionId, newTransaction)
+                .orElse(null);
+    }
+
+    @PatchMapping("{transactionId}")
+    Transaction patchTransaction(@PathVariable int transactionId, @RequestBody Transaction transaction) {
+        return transactionService.patchTransaction(transactionId, transaction)
+                .orElse(null);
+    }
+
     @DeleteMapping("{transactionId}")
     Transaction deleteTransaction(@PathVariable int transactionId) {
         return transactionService.deleteTransaction(transactionId)
                 .orElse(null);
     }
 }
+

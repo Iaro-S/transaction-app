@@ -34,13 +34,13 @@ public class TransactionService {
                 .findFirst();
     }
 
-   /* public Transaction addTransaction(Transaction transaction) {
-        return addTransaction(maxId() + 1, transaction);
-    }*/
-
     public Transaction addTransaction(Transaction transaction) {
+        return addTransaction(maxId() + 1, transaction);
+    }
+
+    public Transaction addTransaction(int transactionId, Transaction transaction) {
         Transaction newTransaction = new Transaction(
-                maxId() + 1,
+                transactionId,
                 transaction.product(),
                 transaction.type(),
                 transaction.amount()
@@ -54,6 +54,26 @@ public class TransactionService {
                 .mapToInt(Transaction::id)
                 .max()
                 .orElse(1);
+    }
+
+    public Optional<Transaction> replaceTransaction(int transactionId, Transaction newTransaction) {
+        Optional<Transaction> replacedTransaction = deleteTransaction(transactionId);
+        replacedTransaction
+                .ifPresent(deletedTransaction -> addTransaction(transactionId, newTransaction));
+        return replacedTransaction;
+    }
+
+    public Optional<Transaction> patchTransaction(int transactionId, Transaction transaction) {
+        Optional<Transaction> transactionById = getById(transactionId);
+        Optional<Transaction> patchedTransaction = transactionById.
+                map(oldTransaction -> new Transaction(
+                        oldTransaction.id(),
+                        transaction.product() != null ? transaction.product() : oldTransaction.product(),
+                        oldTransaction.type(),
+                        transaction.amount() != 0 ? transaction.amount() : oldTransaction.amount()
+                ));
+        patchedTransaction.ifPresent(newTransaction -> replaceTransaction(transactionId, newTransaction));
+        return patchedTransaction;
     }
 
     public Optional<Transaction> deleteTransaction(int transactionId) {
