@@ -2,14 +2,12 @@ package ro.fasttrackit.homework19.transactionapp.service;
 
 import org.springframework.stereotype.Service;
 import ro.fasttrackit.homework19.transactionapp.model.Transaction;
-import ro.fasttrackit.homework19.transactionapp.model.TransactionType;
 import ro.fasttrackit.homework19.transactionapp.model.TransactionReader;
+import ro.fasttrackit.homework19.transactionapp.model.TransactionType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 @Service
 public class TransactionService {
@@ -45,7 +43,7 @@ public class TransactionService {
                 transaction.type(),
                 transaction.amount()
         );
-        this.transactions.add(newTransaction);
+        this.transactions.add(transactionId - 1, newTransaction);
         return newTransaction;
     }
 
@@ -81,5 +79,33 @@ public class TransactionService {
         transactionOptional.
                 ifPresent(transactions::remove);
         return transactionOptional;
+    }
+
+    public Map<TransactionType, List<Double>> typeReport() {
+        return transactions.stream()
+                .collect(groupingBy(Transaction::type,
+                        mapping(Transaction::amount, toList())
+                ));
+    }
+
+    public Map<String, List<Double>> productReport() {
+        return transactions.stream()
+                .collect(groupingBy(Transaction::product,
+                        mapping(Transaction::amount, toList())
+                ));
+    }
+
+    public Map<TransactionType, Double> sumTypeAmount() {
+        return transactions.stream()
+                .collect(groupingBy(Transaction::type,
+                        summingDouble(Transaction::amount)
+                ));
+    }
+
+    public Map<String, Double> sumProductAmount() {
+        return transactions.stream()
+                .collect(groupingBy(Transaction::product,
+                        summingDouble(Transaction::amount)
+                ));
     }
 }
