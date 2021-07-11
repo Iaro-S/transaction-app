@@ -18,7 +18,7 @@ public class TransactionController {
     }
 
     //http://localhost:8080/transactions?productName=audi&productType=BUY&minAmount=0.01&maxAmount=57550.99
-    @GetMapping()
+    @GetMapping
     public List<Transaction> getMultipleFilters(@RequestParam(required = false) String productName,
                                                 @RequestParam(required = false) TransactionType productType,
                                                 @RequestParam(required = false) Double minAmount,
@@ -27,13 +27,12 @@ public class TransactionController {
         return transactionService.getAllTransactionsFilterable(productName, productType, minAmount, maxAmount);
     }
 
-    //http://localhost:8080/transactions/id?productId=19 -asa l-am facut initial
     //http://localhost:8080/transactions/19
 
     @GetMapping("/{productId}")
     public Transaction getById(@PathVariable int productId) {
         return transactionService.getById(productId)
-                .orElseThrow(()->new TransactionNotFoundException("Id " + productId + " not find"));
+                .orElseThrow(() -> new TransactionNotFoundException("Id " + productId + " not find"));
     }
 
     @PostMapping
